@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endeavour International School | Bhopal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#1e3a8a',
+                            900: '#0f172a',
+                        },
+                        gold: {
+                            500: '#d97706',
+                            600: '#b45309',
+                            400: '#fbbf24'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .error-message { color: #dc2626; font-size: 0.85rem; margin-top: 0.25rem; display: none; }
+        .input-error { border-color: #dc2626 !important; }
+        .facility-gallery-card { cursor: pointer; }
+        .facility-gallery-card:focus-visible, .club-gallery-card:focus-visible { outline: 3px solid #d97706; outline-offset: 3px; }
+        .facility-gallery-card img, .club-gallery-card img { transition: transform 500ms cubic-bezier(.2,.7,.2,1); }
+        .facility-gallery-card:hover img, .club-gallery-card:hover img { transform: scale(1.045); }
+        .club-gallery-card { display: block; min-width: 0; overflow: hidden; border: 1px solid #334155; border-radius: 12px; padding: 0; background: #1e293b; color: white; text-align: left; transition: transform 200ms ease, border-color 200ms ease; }
+        .club-gallery-card:hover { transform: translateY(-4px); border-color: #d97706; }
+        .club-gallery-card img { display: block; width: 100%; height: 108px; object-fit: cover; }
+        .club-gallery-label { display: block; padding: 12px 14px; }
+        .club-gallery-hint { display: block; margin-top: 4px; color: #cbd5e1; font-size: 11px; }
+        #photoGalleryDialog { width: min(980px, calc(100vw - 24px)); max-width: none; max-height: 92vh; overflow: auto; border: 1px solid #334155; border-radius: 16px; padding: 0; background: #0f172a; color: white; box-shadow: 0 24px 90px #0008; }
+        #photoGalleryDialog::backdrop { background: rgb(2 6 23 / 78%); backdrop-filter: blur(5px); animation: gallery-backdrop 220ms ease both; }
+        @keyframes gallery-backdrop { from { opacity: 0; } to { opacity: 1; } }
+        .gallery-shell { padding: 18px; }
+        .gallery-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+        .gallery-heading h2 { margin: 0; font-size: 22px; }
+        .gallery-heading p { margin: 5px 0 0; color: #cbd5e1; font-size: 13px; }
+        .gallery-close { display: grid; width: 40px; height: 40px; flex: 0 0 auto; place-items: center; border: 1px solid #475569; border-radius: 50%; background: #1e293b; color: white; font-size: 20px; }
+        .gallery-close:hover, .gallery-nav:hover { background: #334155; }
+        .gallery-stage { position: relative; display: grid; min-height: 240px; place-items: center; overflow: hidden; border-radius: 10px; background: #020617; }
+        .gallery-stage img { display: block; width: 100%; max-height: min(64vh, 620px); object-fit: contain; }
+        .gallery-image-enter { animation: gallery-image-enter 420ms cubic-bezier(.2,.7,.2,1) both; }
+        @keyframes gallery-image-enter { from { opacity: .45; transform: scale(.975); } to { opacity: 1; transform: scale(1); } }
+        .gallery-nav { position: absolute; top: 50%; display: grid; width: 42px; height: 42px; place-items: center; transform: translateY(-50%); border: 1px solid #ffffff55; border-radius: 50%; background: #0f172a99; color: white; font-size: 22px; }
+        .gallery-nav.previous { left: 12px; }
+        .gallery-nav.next { right: 12px; }
+        .gallery-caption { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 2px 14px; color: #e2e8f0; font-size: 13px; }
+        .gallery-thumbnails { display: flex; gap: 9px; overflow-x: auto; padding: 2px 1px 4px; }
+        .gallery-thumb { width: 84px; height: 58px; flex: 0 0 auto; overflow: hidden; border: 2px solid transparent; border-radius: 7px; padding: 0; background: #1e293b; opacity: .7; }
+        .gallery-thumb[aria-pressed="true"] { border-color: #fbbf24; opacity: 1; }
+        .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-pattern-drift { animation: hero-drift 24s ease-in-out infinite alternate; }
+        .motion-ready [data-reveal] {
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity 650ms ease, transform 650ms cubic-bezier(0.2, 0.7, 0.2, 1);
+            transition-delay: var(--reveal-delay, 0ms);
+        }
+        .motion-ready [data-reveal].is-visible { opacity: 1; transform: translateY(0); }
+        @keyframes hero-drift {
+            from { transform: translate3d(-8px, -5px, 0); }
+            to { transform: translate3d(8px, 5px, 0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+        }
+        body.admin-portal-open { overflow: hidden; }
+        .admin-portal { position: fixed; inset: 0; z-index: 80; display: grid; grid-template-rows: 48px minmax(0, 1fr); background: #f3f5f0; }
+        .admin-portal[hidden] { display: none; }
+        .admin-portal-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; background: #17332d; color: #fff; font: 600 13px sans-serif; }
+        .admin-portal-bar button { border: 1px solid #60796d; border-radius: 6px; padding: 7px 11px; background: transparent; color: #fff; cursor: pointer; }
+        .admin-portal iframe { width: 100%; height: 100%; border: 0; background: #f3f5f0; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300 font-sans">
+
+    <!-- Top Bar & Navbar -->
+    <header class="sticky top-0 z-50 bg-navy-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo & School Name -->
+                <div class="flex items-center space-x-3">
+                    <div class="bg-gold-500 text-navy-950 p-2.5 rounded-lg font-bold text-xl shadow">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold tracking-wide block">Endeavour International</span>
+                        <span class="text-xs text-gold-400 tracking-widest uppercase">CISCE Affiliated • Bhopal</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center space-x-8 font-medium">
+                    <a href="#home" class="hover:text-gold-400 transition">Home</a>
+                    <a href="#about" class="hover:text-gold-400 transition">About</a>
+                    <a href="#academics" class="hover:text-gold-400 transition">Academics</a>
+                    <a href="#facilities" class="hover:text-gold-400 transition">Facilities & Clubs</a>
+                    <a href="#admissions" class="hover:text-gold-400 transition">Admissions</a>
+                    <a href="#contact" class="hover:text-gold-400 transition">Contact</a>
+                    <a href="#admin" class="hidden xl:inline-block hover:text-gold-400 transition">Staff Admin</a>
+                </nav>
+
+                <!-- Actions: Dark Mode & Apply CTA -->
+                <div class="flex items-center space-x-4">
+                    <button id="darkModeToggle" aria-label="Toggle Dark Mode" class="p-2.5 rounded-full bg-slate-800 dark:bg-slate-800 text-gold-400 hover:bg-slate-700 transition">
+                        <i class="fa-solid fa-moon dark:hidden"></i>
+                        <i class="fa-solid fa-sun hidden dark:inline"></i>
+                    </button>
+                    <a href="#admissions" class="hidden sm:inline-block bg-gold-500 hover:bg-gold-600 text-navy-950 font-bold px-5 py-2.5 rounded-lg shadow transition">
+                        Apply Now
+                    </a>
+                    <!-- Mobile Menu Button -->
+                    <button id="mobileMenuBtn" aria-label="Open Menu" class="md:hidden text-white focus:outline-none text-2xl">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-navy-900 border-t border-slate-800 px-4 pt-2 pb-4 space-y-2">
+            <a href="#home" class="block py-2 hover:text-gold-400">Home</a>
+            <a href="#about" class="block py-2 hover:text-gold-400">About</a>
+            <a href="#academics" class="block py-2 hover:text-gold-400">Academics</a>
+            <a href="#facilities" class="block py-2 hover:text-gold-400">Facilities & Clubs</a>
+            <a href="#admissions" class="block py-2 hover:text-gold-400">Admissions</a>
+            <a href="#contact" class="block py-2 hover:text-gold-400">Contact</a>
+            <a href="#admin" class="block py-2 hover:text-gold-400">Staff Admin</a>
+        </div>
+    </header>
+
+    <!-- 1. Home Section -->
+    <section id="home" class="relative bg-navy-900 text-white py-24 lg:py-32 overflow-hidden">
+        <div class="hero-pattern-drift absolute inset-0 opacity-20 bg-[radial-gradient(#d97706_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <span class="inline-block bg-gold-500/10 text-gold-400 border border-gold-500/30 px-4 py-1.5 rounded-full text-sm font-semibold mb-6">
+                Admissions Open for Academic Session 2026-27
+            </span>
+            <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6">
+                Endeavour International School
+            </h1>
+            <p class="text-xl sm:text-2xl text-slate-300 max-w-3xl mx-auto mb-10 font-light">
+                Empowering bright minds in Bhopal with world-class education rooted in rigorous inquiry, character, and global perspectives.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="#admissions" class="bg-gold-500 hover:bg-gold-600 text-navy-950 font-bold px-8 py-4 rounded-xl shadow-lg transition text-lg">
+                    Begin Admission Enquiry
+                </a>
+                <a href="#about" class="bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-semibold px-8 py-4 rounded-xl transition text-lg">
+                    Read Founder's Story
+                </a>
+            </div>
+
+            <!-- Headline Facts Grid -->
+            <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+                <div class="bg-slate-800/60 border border-slate-700/60 p-6 rounded-2xl backdrop-blur">
+                    <div class="text-gold-400 text-3xl font-bold mb-1">Grades 1-12</div>
+                    <div class="text-slate-400 text-sm">Comprehensive Day School</div>
+                </div>
+                <div class="bg-slate-800/60 border border-slate-700/60 p-6 rounded-2xl backdrop-blur">
+                    <div class="text-gold-400 text-3xl font-bold mb-1">Max 25</div>
+                    <div class="text-slate-400 text-sm">Students per Class</div>
+                </div>
+                <div class="bg-slate-800/60 border border-slate-700/60 p-6 rounded-2xl backdrop-blur">
+                    <div class="text-gold-400 text-3xl font-bold mb-1">1:15</div>
+                    <div class="text-slate-400 text-sm">Teacher-Student Ratio</div>
+                </div>
+                <div class="bg-slate-800/60 border border-slate-700/60 p-6 rounded-2xl backdrop-blur">
+                    <div class="text-gold-400 text-3xl font-bold mb-1">CISCE</div>
+                    <div class="text-slate-400 text-sm">Affiliated Curriculum</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. About Section -->
+    <section id="about" class="py-20 bg-white dark:bg-slate-900 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-navy-900 dark:text-white mb-4">About Endeavour</h2>
+                <div class="h-1.5 w-24 bg-gold-500 mx-auto rounded"></div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+                <div>
+                    <h3 class="text-2xl font-bold text-navy-900 dark:text-white mb-4">Founder's Story</h3>
+                    <blockquote class="text-slate-600 dark:text-slate-300 space-y-4 italic border-l-4 border-gold-500 pl-4 bg-slate-50 dark:bg-slate-800/50 p-6 rounded-r-xl">
+                        <p>"Namaste. I hold a PhD in Education Policy from Harvard University, and for the last 17 years I worked in the United States, studying why some schools lift every child and others quietly leave children behind. I advised school districts, trained teachers and published research. By any measure it was a good career."</p>
+                        <p>"But every time I came home to India, I met bright children with real talent and no place that knew how to grow it. I kept asking myself one question: what is the use of knowing how great schools work if I never build one for my own people?"</p>
+                        <p>"So I came back. Endeavour International School will teach students from Grade 1 to Grade 12, in Bhopal, Madhya Pradesh. We are affiliated with the Council for the Indian School Certificate Examinations (CISCE), and our first batch begins in the coming academic session."</p>
+                        <p class="font-bold not-italic text-navy-900 dark:text-white">— Dr. Harshvardhan Shrivastva, Founder and Principal</p>
+                    </blockquote>
+                </div>
+                <div class="space-y-8">
+                    <div class="bg-slate-100 dark:bg-slate-800 p-8 rounded-2xl border border-slate-200 dark:border-slate-700">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="bg-gold-500 text-navy-950 p-3 rounded-xl text-xl">
+                                <i class="fa-solid fa-eye"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-navy-900 dark:text-white">Our Vision</h4>
+                        </div>
+                        <p class="text-slate-600 dark:text-slate-300">To cultivate inquiring, knowledgeable, and compassionate young leaders who create positive change in society through academic excellence and strong ethical grounding.</p>
+                    </div>
+
+                    <div class="bg-slate-100 dark:bg-slate-800 p-8 rounded-2xl border border-slate-200 dark:border-slate-700">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="bg-gold-500 text-navy-950 p-3 rounded-xl text-xl">
+                                <i class="fa-solid fa-bullseye"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-navy-900 dark:text-white">Our Mission</h4>
+                        </div>
+                        <p class="text-slate-600 dark:text-slate-300">To provide an inspiring, child-centric learning environment with low class sizes, expert faculty, and holistic co-curricular development that nurtures every child's unique potential.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Why Choose Endeavour -->
+            <div class="bg-navy-900 text-white rounded-3xl p-8 sm:p-12 shadow-xl">
+                <h3 class="text-2xl font-bold mb-8 text-center">Why Parents Trust Endeavour</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="flex space-x-4">
+                        <div class="text-gold-400 text-2xl"><i class="fa-solid fa-check-circle"></i></div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">Harvard-Backed Leadership</h4>
+                            <p class="text-slate-300 text-sm">Founded by a Harvard PhD in Education Policy, applying proven global educational frameworks to Indian schooling.</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-4">
+                        <div class="text-gold-400 text-2xl"><i class="fa-solid fa-check-circle"></i></div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">Individual Attention</h4>
+                            <p class="text-slate-300 text-sm">Strictly capped at 25 students per class with a 1:15 teacher-to-student ratio ensuring personalized mentoring.</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-4">
+                        <div class="text-gold-400 text-2xl"><i class="fa-solid fa-check-circle"></i></div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">Holistic Development</h4>
+                            <p class="text-slate-300 text-sm">Seamless blend of academics, CISCE curriculum, state-of-the-art labs, sports, robotics, and expressive arts.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Academics Section -->
+    <section id="academics" class="py-20 bg-slate-100 dark:bg-slate-800/50 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-navy-900 dark:text-white mb-4">Academic Structure</h2>
+                <div class="h-1.5 w-24 bg-gold-500 mx-auto rounded"></div>
+                <p class="text-slate-600 dark:text-slate-300 mt-4">Affiliated with the Council for the Indian School Certificate Examinations (CISCE).</p>
+            </div>
+
+            <!-- Grade Levels Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+                <div class="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-md border border-slate-200 dark:border-slate-700">
+                    <div class="text-gold-500 font-bold text-sm uppercase mb-2">Grades 1 to 5</div>
+                    <h3 class="text-2xl font-bold text-navy-900 dark:text-white mb-4">Primary School</h3>
+                    <p class="text-slate-600 dark:text-slate-300 text-sm">Building foundational literacy, numeracy, curiosity, and joyful exploration in a warm, supportive environment.</p>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-md border border-slate-200 dark:border-slate-700">
+                    <div class="text-gold-500 font-bold text-sm uppercase mb-2">Grades 6 to 8</div>
+                    <h3 class="text-2xl font-bold text-navy-900 dark:text-white mb-4">Middle School</h3>
+                    <p class="text-slate-600 dark:text-slate-300 text-sm">Fostering critical thinking, scientific inquiry, analytical skills, and collaborative project-based learning.</p>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-md border border-slate-200 dark:border-slate-700">
+                    <div class="text-gold-500 font-bold text-sm uppercase mb-2">Grades 9 to 10</div>
+                    <h3 class="text-2xl font-bold text-navy-900 dark:text-white mb-4">Secondary School</h3>
+                    <p class="text-slate-600 dark:text-slate-300 text-sm">Rigorous preparation for the <strong>ICSE</strong> (Class 10) examinations conducted by CISCE.</p>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-md border border-slate-200 dark:border-slate-700">
+                    <div class="text-gold-500 font-bold text-sm uppercase mb-2">Grades 11 to 12</div>
+                    <h3 class="text-2xl font-bold text-navy-900 dark:text-white mb-4">Senior Secondary</h3>
+                    <p class="text-slate-600 dark:text-slate-300 text-sm">In-depth specialization leading to the <strong>ISC</strong> (Class 12) examinations across diverse streams.</p>
+                </div>
+            </div>
+
+            <!-- Streams in Class 11 & 12 -->
+            <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 sm:p-12 shadow-md border border-slate-200 dark:border-slate-700">
+                <h3 class="text-2xl font-bold text-navy-900 dark:text-white mb-6 text-center">Senior Secondary Streams (Classes 11 & 12)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border-l-4 border-gold-500">
+                        <h4 class="text-xl font-bold text-navy-900 dark:text-white mb-2">Science</h4>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm mb-4">Physics, Chemistry, Mathematics, Biology, Computer Science, and English.</p>
+                        <span class="text-xs bg-gold-500/10 text-gold-500 font-semibold px-3 py-1 rounded-full">ISC Board</span>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border-l-4 border-gold-500">
+                        <h4 class="text-xl font-bold text-navy-900 dark:text-white mb-2">Commerce</h4>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm mb-4">Accounts, Economics, Business Studies, Mathematics/Applied Mathematics, and English.</p>
+                        <span class="text-xs bg-gold-500/10 text-gold-500 font-semibold px-3 py-1 rounded-full">ISC Board</span>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border-l-4 border-gold-500">
+                        <h4 class="text-xl font-bold text-navy-900 dark:text-white mb-2">Humanities</h4>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm mb-4">History, Political Science, Psychology, Economics, Sociology, and English.</p>
+                        <span class="text-xs bg-gold-500/10 text-gold-500 font-semibold px-3 py-1 rounded-full">ISC Board</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Facilities & Activities Section -->
+    <section id="facilities" class="py-20 bg-white dark:bg-slate-900 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-navy-900 dark:text-white mb-4">Campus Facilities & Activities</h2>
+                <div class="h-1.5 w-24 bg-gold-500 mx-auto rounded"></div>
+            </div>
+
+            <!-- Facilities Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                <div class="facility-gallery-card bg-slate-50 dark:bg-slate-800 rounded-2xl overflow-hidden shadow border border-slate-200 dark:border-slate-700" data-gallery-key="classrooms" role="button" tabindex="0" aria-haspopup="dialog" aria-label="Open Smart Classrooms photo gallery">
+                    <img src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=600&q=80" alt="Smart Classrooms" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-navy-900 dark:text-white mb-2">Smart Classrooms</h3>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm">Technology-enabled interactive displays designed to make complex concepts engaging and immersive.</p>
+                    </div>
+                </div>
+                <div class="facility-gallery-card bg-slate-50 dark:bg-slate-800 rounded-2xl overflow-hidden shadow border border-slate-200 dark:border-slate-700" data-gallery-key="labs" role="button" tabindex="0" aria-haspopup="dialog" aria-label="Open Science and Computer Labs photo gallery">
+                    <img src="https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=600&q=80" alt="Science & Computer Labs" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-navy-900 dark:text-white mb-2">Science & Computer Labs</h3>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm">Advanced apparatus for physics, chemistry, biology, and high-speed computing workstations.</p>
+                    </div>
+                </div>
+                <div class="facility-gallery-card bg-slate-50 dark:bg-slate-800 rounded-2xl overflow-hidden shadow border border-slate-200 dark:border-slate-700" data-gallery-key="library" role="button" tabindex="0" aria-haspopup="dialog" aria-label="Open Resource Library photo gallery">
+                    <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=600&q=80" alt="Library" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-navy-900 dark:text-white mb-2">Resource Library</h3>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm">Thousands of curated books, journals, and digital research terminals for quiet study.</p>
+                    </div>
+                </div>
+                <div class="facility-gallery-card bg-slate-50 dark:bg-slate-800 rounded-2xl overflow-hidden shadow border border-slate-200 dark:border-slate-700" data-gallery-key="sports" role="button" tabindex="0" aria-haspopup="dialog" aria-label="Open Sports Ground photo gallery">
+                    <img src="https://images.unsplash.com/photo-1576267423445-b2e0074d68a4?auto=format&fit=crop&w=600&q=80" alt="Sports Ground" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-navy-900 dark:text-white mb-2">Sports Ground</h3>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm">Expansive outdoor grounds for football, cricket, basketball, track events, and physical fitness.</p>
+                    </div>
+                </div>
+                <div class="facility-gallery-card bg-slate-50 dark:bg-slate-800 rounded-2xl overflow-hidden shadow border border-slate-200 dark:border-slate-700" data-gallery-key="arts" role="button" tabindex="0" aria-haspopup="dialog" aria-label="Open Music and Art Room photo gallery">
+                    <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80" alt="Music and Art Room" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-navy-900 dark:text-white mb-2">Music & Art Room</h3>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm">Dedicated spaces for instrumental music, vocal training, classical arts, painting, and sculpting.</p>
+                    </div>
+                </div>
+                <div class="facility-gallery-card bg-slate-50 dark:bg-slate-800 rounded-2xl overflow-hidden shadow border border-slate-200 dark:border-slate-700" data-gallery-key="transport" role="button" tabindex="0" aria-haspopup="dialog" aria-label="Open School Transport photo gallery">
+                    <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80" alt="Transport Service" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-navy-900 dark:text-white mb-2">School Transport</h3>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm">Safe, GPS-enabled school bus service covering major residential areas across Bhopal city.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clubs and Activities -->
+            <div class="bg-navy-900 text-white rounded-3xl p-8 sm:p-12">
+                <h3 class="text-2xl font-bold mb-6 text-center">Clubs & Student Activities</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 text-center">
+                    <button type="button" class="club-gallery-card" data-gallery-key="debate" aria-haspopup="dialog"><img src="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=500&q=80" alt="Speaker addressing an audience" loading="lazy"><span class="club-gallery-label"><span class="font-bold">Debate</span><span class="club-gallery-hint">View photos</span></span></button>
+                    <button type="button" class="club-gallery-card" data-gallery-key="model-un" aria-haspopup="dialog"><img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=500&q=80" alt="Students at a conference" loading="lazy"><span class="club-gallery-label"><span class="font-bold">Model UN</span><span class="club-gallery-hint">View photos</span></span></button>
+                    <button type="button" class="club-gallery-card" data-gallery-key="coding" aria-haspopup="dialog"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=500&q=80" alt="Students working with computers" loading="lazy"><span class="club-gallery-label"><span class="font-bold">Coding</span><span class="club-gallery-hint">View photos</span></span></button>
+                    <button type="button" class="club-gallery-card" data-gallery-key="robotics" aria-haspopup="dialog"><img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=500&q=80" alt="Robotics project" loading="lazy"><span class="club-gallery-label"><span class="font-bold">Robotics</span><span class="club-gallery-hint">View photos</span></span></button>
+                    <button type="button" class="club-gallery-card col-span-2 sm:col-span-1" data-gallery-key="yoga" aria-haspopup="dialog"><img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=500&q=80" alt="Yoga practice" loading="lazy"><span class="club-gallery-label"><span class="font-bold">Yoga</span><span class="club-gallery-hint">View photos</span></span></button>
+                </div>
+            </div>
+
+            <!-- Key Admission Dates Timeline (Bonus Feature) -->
+            <div class="mt-16">
+                <h3 class="text-2xl font-bold text-navy-900 dark:text-white mb-8 text-center">Key Admission Dates (2026-27)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border-t-4 border-gold-500">
+                        <span class="text-xs text-gold-500 font-bold uppercase">Phase 1</span>
+                        <h4 class="font-bold text-lg text-navy-900 dark:text-white my-1">Enquiries Open</h4>
+                        <p class="text-slate-500 text-sm">October 15, 2026</p>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border-t-4 border-gold-500">
+                        <span class="text-xs text-gold-500 font-bold uppercase">Phase 2</span>
+                        <h4 class="font-bold text-lg text-navy-900 dark:text-white my-1">Campus Interaction</h4>
+                        <p class="text-slate-500 text-sm">November 10, 2026</p>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border-t-4 border-gold-500">
+                        <span class="text-xs text-gold-500 font-bold uppercase">Phase 3</span>
+                        <h4 class="font-bold text-lg text-navy-900 dark:text-white my-1">Admission Offers</h4>
+                        <p class="text-slate-500 text-sm">December 01, 2026</p>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border-t-4 border-gold-500">
+                        <span class="text-xs text-gold-500 font-bold uppercase">Session Begins</span>
+                        <h4 class="font-bold text-lg text-navy-900 dark:text-white my-1">First Batch Classes</h4>
+                        <p class="text-slate-500 text-sm">April 05, 2027</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Admission Enquiry Form Section -->
+    <section id="admissions" class="py-20 bg-slate-100 dark:bg-slate-800/50 transition-colors">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl sm:text-4xl font-bold text-navy-900 dark:text-white mb-4">Admission Enquiry</h2>
+                <div class="h-1.5 w-24 bg-gold-500 mx-auto rounded"></div>
+                <p class="text-slate-600 dark:text-slate-300 mt-4">Take the first step toward your child's bright future. Fill out the form below.</p>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 sm:p-12 shadow-xl border border-slate-200 dark:border-slate-700">
+                <div id="formContainer">
+                    <form id="enquiryForm" class="space-y-6" novalidate>
+                        
+                        <!-- Parent/Guardian Name -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Parent or Guardian Name *</label>
+                            <input type="text" id="parentName" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent focus:ring-2 focus:ring-gold-500 focus:outline-none" placeholder="Enter parent/guardian full name">
+                            <div class="error-message" id="parentNameError">Please enter parent or guardian name.</div>
+                        </div>
+
+                        <!-- Child's Name -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Child's Name *</label>
+                            <input type="text" id="childName" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent focus:ring-2 focus:ring-gold-500 focus:outline-none" placeholder="Enter child's full name">
+                            <div class="error-message" id="childNameError">Please enter child's name.</div>
+                        </div>
+
+                        <!-- Child's Date of Birth (With Auto-Grade Suggestion Bonus) -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Child's Date of Birth * <span class="text-xs font-normal text-gold-500">(Auto-suggests grade)</span></label>
+                            <input type="date" id="dob" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent focus:ring-2 focus:ring-gold-500 focus:outline-none">
+                            <div class="error-message" id="dobError">Please enter a valid date of birth.</div>
+                        </div>
+
+                        <!-- Grade Applying For -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Grade Applying For *</label>
+                            <select id="grade" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-gold-500 focus:outline-none">
+                                <option value="">Select Grade</option>
+                                <option value="Grade 1">Grade 1</option>
+                                <option value="Grade 2">Grade 2</option>
+                                <option value="Grade 3">Grade 3</option>
+                                <option value="Grade 4">Grade 4</option>
+                                <option value="Grade 5">Grade 5</option>
+                                <option value="Grade 6">Grade 6</option>
+                                <option value="Grade 7">Grade 7</option>
+                                <option value="Grade 8">Grade 8</option>
+                                <option value="Grade 9">Grade 9</option>
+                                <option value="Grade 10">Grade 10</option>
+                                <option value="Grade 11">Grade 11</option>
+                                <option value="Grade 12">Grade 12</option>
+                            </select>
+                            <div class="error-message" id="gradeError">Please select a grade.</div>
+                        </div>
+
+                        <!-- Email Address -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Email Address *</label>
+                            <input type="email" id="email" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent focus:ring-2 focus:ring-gold-500 focus:outline-none" placeholder="parent@example.com">
+                            <div class="error-message" id="emailError">Please enter a valid email address.</div>
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Phone Number (10 digits) *</label>
+                            <input type="tel" id="phone" maxlength="10" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent focus:ring-2 focus:ring-gold-500 focus:outline-none" placeholder="9876543210">
+                            <div class="error-message" id="phoneError">Please enter a valid 10-digit phone number.</div>
+                        </div>
+
+                        <!-- Previous School -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Previous School (Optional)</label>
+                            <input type="text" id="prevSchool" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent focus:ring-2 focus:ring-gold-500 focus:outline-none" placeholder="Name of previous school if applicable">
+                        </div>
+
+                        <!-- How did you hear about us -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">How did you hear about us? *</label>
+                            <div class="flex flex-wrap gap-6 mt-2">
+                                <label class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="radio" name="source" value="Newspaper" class="text-gold-500 focus:ring-gold-500">
+                                    <span>Newspaper</span>
+                                </label>
+                                <label class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="radio" name="source" value="Social media" class="text-gold-500 focus:ring-gold-500">
+                                    <span>Social media</span>
+                                </label>
+                                <label class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="radio" name="source" value="Friend" class="text-gold-500 focus:ring-gold-500">
+                                    <span>Friend</span>
+                                </label>
+                                <label class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="radio" name="source" value="Other" class="text-gold-500 focus:ring-gold-500">
+                                    <span>Other</span>
+                                </label>
+                            </div>
+                            <div class="error-message" id="sourceError">Please select how you heard about us.</div>
+                        </div>
+
+                        <!-- Message -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Message or Special Requirements (Optional)</label>
+                            <textarea id="message" rows="4" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent focus:ring-2 focus:ring-gold-500 focus:outline-none" placeholder="Any specific questions or details..."></textarea>
+                        </div>
+
+                        <!-- Consent Checkbox -->
+                        <div>
+                            <label class="flex items-start space-x-3 cursor-pointer">
+                                <input type="checkbox" id="consent" class="mt-1 text-gold-500 rounded focus:ring-gold-500">
+                                <span class="text-sm text-slate-600 dark:text-slate-300">I consent to be contacted by Endeavour International School regarding admission updates and information. *</span>
+                            </label>
+                            <div class="error-message" id="consentError">You must consent to be contacted.</div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="w-full bg-gold-500 hover:bg-gold-600 text-navy-950 font-bold py-4 rounded-xl shadow-lg transition text-lg">
+                            Submit Admission Enquiry
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Thank You Message (Replaces form on successful submission) -->
+                <div id="thankYouMessage" class="hidden text-center py-12 space-y-6">
+                    <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto text-4xl shadow">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-navy-900 dark:text-white">Enquiry Received Successfully!</h3>
+                    <p class="text-slate-600 dark:text-slate-300 max-w-md mx-auto">
+                        Thank you, <span id="confParentName" class="font-semibold text-gold-500"></span>. We have received your admission enquiry for <span id="confChildName" class="font-semibold text-gold-500"></span> (<span id="confGrade" class="font-semibold text-gold-500"></span>). Our admissions team will reach out to you shortly at <span id="confEmail" class="font-semibold text-gold-500"></span>.
+                    </p>
+                    <button onclick="resetForm()" class="bg-navy-900 hover:bg-slate-800 text-white font-bold px-6 py-3 rounded-xl transition">
+                        Submit Another Enquiry
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Contact and Footer Section -->
+    <footer id="contact" class="bg-navy-900 text-white pt-16 pb-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div class="space-y-4">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-gold-500 text-navy-950 p-2 rounded-lg font-bold">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <span class="text-lg font-bold">Endeavour International School</span>
+                </div>
+                <p class="text-slate-400 text-sm">
+                    Affiliated with the Council for the Indian School Certificate Examinations (CISCE), Bhopal.
+                </p>
+                <div class="flex space-x-4 text-gold-400 text-lg">
+                    <a href="#" aria-label="Facebook" class="hover:text-white transition"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#" aria-label="Instagram" class="hover:text-white transition"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" aria-label="LinkedIn" class="hover:text-white transition"><i class="fa-brands fa-linkedin"></i></a>
+                    <a href="#" aria-label="YouTube" class="hover:text-white transition"><i class="fa-brands fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="text-gold-400 font-bold mb-4 uppercase text-sm tracking-wider">Quick Links</h4>
+                <ul class="space-y-2 text-slate-300 text-sm">
+                    <li><a href="#home" class="hover:text-gold-400 transition">Home</a></li>
+                    <li><a href="#about" class="hover:text-gold-400 transition">About Founder</a></li>
+                    <li><a href="#academics" class="hover:text-gold-400 transition">Academics & Streams</a></li>
+                    <li><a href="#facilities" class="hover:text-gold-400 transition">Campus Facilities</a></li>
+                    <li><a href="#admissions" class="hover:text-gold-400 transition">Admissions</a></li>
+                    <li><a href="#admin" class="hover:text-gold-400 transition">Staff Admin</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-gold-400 font-bold mb-4 uppercase text-sm tracking-wider">School Timings</h4>
+                <p class="text-slate-300 text-sm mb-2"><i class="fa-regular fa-clock mr-2 text-gold-400"></i> Monday to Saturday</p>
+                <p class="text-slate-300 text-sm">8:00 AM to 2:30 PM</p>
+            </div>
+
+            <div>
+                <h4 class="text-gold-400 font-bold mb-4 uppercase text-sm tracking-wider">Contact Info</h4>
+                <ul class="space-y-3 text-slate-300 text-sm">
+                    <li><i class="fa-solid fa-location-dot mr-2 text-gold-400"></i> Bhopal, Madhya Pradesh</li>
+                    <li><i class="fa-solid fa-phone mr-2 text-gold-400"></i> +91 98765 43210</li>
+                    <li><i class="fa-solid fa-envelope mr-2 text-gold-400"></i> info@endeavourschool.edu</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-slate-800 text-center text-slate-500 text-sm">
+            &copy; 2026 Endeavour International School, Bhopal. All rights reserved. Affiliated with CISCE.
+        </div>
+    </footer>
+
+    <div id="adminPortal" class="admin-portal" hidden aria-hidden="true">
+        <div class="admin-portal-bar">
+            <span>Endeavour staff dashboard</span>
+            <button type="button" id="closeAdminPortal">← Return to school website</button>
+        </div>
+        <iframe id="adminDashboardFrame" src="admin.html" title="Endeavour school administration dashboard"></iframe>
+    </div>
+
+    <dialog id="photoGalleryDialog" aria-labelledby="galleryTitle">
+        <div class="gallery-shell">
+            <div class="gallery-heading">
+                <div><h2 id="galleryTitle"></h2><p>Photo gallery</p></div>
+                <button type="button" id="galleryClose" class="gallery-close" aria-label="Close photo gallery">&times;</button>
+            </div>
+            <div class="gallery-stage">
+                <img id="galleryImage" src="" alt="">
+                <button type="button" id="galleryPrevious" class="gallery-nav previous" aria-label="Previous photo">&#8249;</button>
+                <button type="button" id="galleryNext" class="gallery-nav next" aria-label="Next photo">&#8250;</button>
+            </div>
+            <div class="gallery-caption"><span id="galleryCaption"></span><span id="galleryCounter" aria-live="polite"></span></div>
+            <div id="galleryThumbnails" class="gallery-thumbnails" role="group" aria-label="Choose a photo"></div>
+        </div>
+    </dialog>
+
+    <!-- JavaScript for Interactivity & Validation -->
+    <script>
+        const galleryPhoto = (id, alt, caption) => ({
+            src: `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1400&q=85`,
+            alt,
+            caption
+        });
+        const photoGalleries = {
+            classrooms: [
+                galleryPhoto('photo-1580582932707-520aed937b7b', 'Bright classroom with desks and a teaching board', 'Flexible classroom spaces for focused learning.'),
+                galleryPhoto('photo-1509062522246-3755977927d7', 'Students learning together in a classroom', 'Collaborative lessons bring ideas to life.'),
+                galleryPhoto('photo-1503676260728-1c00da094a0b', 'Teacher supporting students at their desks', 'Personal attention helps every learner progress.')
+            ],
+            labs: [
+                galleryPhoto('photo-1562774053-701939374585', 'Modern school building and learning spaces', 'Purpose-built spaces for science and computing.'),
+                galleryPhoto('photo-1532094349884-543bc11b234d', 'Colorful scientific glassware in a laboratory', 'Hands-on science encourages careful investigation.'),
+                galleryPhoto('photo-1516321318423-f06f85e504b3', 'Students using computers for a project', 'Digital tools support practical problem-solving.')
+            ],
+            library: [
+                galleryPhoto('photo-1521587760476-6c12a4b040da', 'Shelves filled with books in a library', 'A welcoming place to read, research, and reflect.'),
+                galleryPhoto('photo-1507842217343-583bb7270b66', 'Quiet reading room lined with bookshelves', 'Room to explore new interests and ideas.')
+            ],
+            sports: [
+                galleryPhoto('photo-1576267423445-b2e0074d68a4', 'Outdoor school sports field', 'Space for team sports and daily movement.'),
+                galleryPhoto('photo-1461896836934-ffe607ba8211', 'Athlete running on an outdoor track', 'Students build confidence through active play.')
+            ],
+            arts: [
+                galleryPhoto('photo-1511671782779-c97d3d27a1d4', 'Musician performing with a guitar', 'Music gives students another way to express ideas.'),
+                galleryPhoto('photo-1513364776144-60967b0f800f', 'Artist painting in a bright studio', 'Creative practice develops imagination and craft.')
+            ],
+            transport: [
+                galleryPhoto('photo-1544620347-c4fd4a3d5957', 'Passenger bus ready for a journey', 'Reliable transport helps students reach campus.'),
+                galleryPhoto('photo-1570125909232-eb263c188f7e', 'School bus parked outdoors', 'Safe journeys are part of a supportive school day.')
+            ],
+            debate: [
+                galleryPhoto('photo-1475721027785-f74eccf877e2', 'Speaker addressing an audience', 'Students practice clear arguments and confident speaking.'),
+                galleryPhoto('photo-1544531586-fde5298cdd40', 'Audience listening to a speaker on stage', 'Respectful discussion makes room for different views.')
+            ],
+            'model-un': [
+                galleryPhoto('photo-1540575467063-178a50c2df87', 'Delegates gathered for a conference', 'Students explore diplomacy and global issues.'),
+                galleryPhoto('photo-1511632765486-a01980e01a18', 'Students collaborating around a table', 'Research and teamwork prepare students for debate.')
+            ],
+            coding: [
+                galleryPhoto('photo-1516321318423-f06f85e504b3', 'Learners working together with computers', 'Young programmers turn questions into projects.'),
+                galleryPhoto('photo-1519389950473-47ba0277781c', 'Team sharing ideas around a laptop', 'Creative problem-solving starts with collaboration.')
+            ],
+            robotics: [
+                galleryPhoto('photo-1485827404703-89b55fcc595e', 'Small educational robot on a desk', 'Robotics makes engineering concepts tangible.'),
+                galleryPhoto('photo-1581091226825-a6a2a5aee158', 'Learner building an electronics project', 'Students learn by building, testing, and improving.')
+            ],
+            yoga: [
+                galleryPhoto('photo-1544367567-0f2fcb009e0b', 'People practicing yoga together', 'Movement and breathing support balance and focus.'),
+                galleryPhoto('photo-1506126613408-eca07ce68773', 'Person practicing a calm seated meditation', 'Quiet practice creates space to reset and recharge.')
+            ]
+        };
+        const photoDialog = document.getElementById('photoGalleryDialog');
+        const galleryImage = document.getElementById('galleryImage');
+        const galleryThumbnails = document.getElementById('galleryThumbnails');
+        let activeGalleryKey = '';
+        let activePhotoIndex = 0;
+
+        function renderGalleryPhoto() {
+            const photos = photoGalleries[activeGalleryKey];
+            const photo = photos[activePhotoIndex];
+            galleryImage.classList.remove('gallery-image-enter');
+            galleryImage.src = photo.src;
+            galleryImage.alt = photo.alt;
+            document.getElementById('galleryCaption').textContent = photo.caption;
+            document.getElementById('galleryCounter').textContent = `${activePhotoIndex + 1} / ${photos.length}`;
+            galleryThumbnails.replaceChildren(...photos.map((item, index) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'gallery-thumb';
+                button.setAttribute('aria-label', `Show photo ${index + 1}: ${item.alt}`);
+                button.setAttribute('aria-pressed', String(index === activePhotoIndex));
+                button.innerHTML = `<img src="${item.src.replace('w=1400', 'w=180')}" alt="">`;
+                button.addEventListener('click', () => {
+                    activePhotoIndex = index;
+                    renderGalleryPhoto();
+                });
+                return button;
+            }));
+            requestAnimationFrame(() => galleryImage.classList.add('gallery-image-enter'));
+        }
+
+        function openPhotoGallery(key) {
+            if (!photoGalleries[key]) return;
+            activeGalleryKey = key;
+            activePhotoIndex = 0;
+            document.getElementById('galleryTitle').textContent = document.querySelector(`[data-gallery-key="${key}"] h3, [data-gallery-key="${key}"] h4, [data-gallery-key="${key}"] .font-bold`)?.textContent.trim() || 'Campus photos';
+            renderGalleryPhoto();
+            photoDialog.showModal();
+        }
+
+        function moveGalleryPhoto(direction) {
+            const photos = photoGalleries[activeGalleryKey];
+            activePhotoIndex = (activePhotoIndex + direction + photos.length) % photos.length;
+            renderGalleryPhoto();
+        }
+
+        document.addEventListener('click', (event) => {
+            const galleryTrigger = event.target.closest('[data-gallery-key]');
+            if (galleryTrigger) openPhotoGallery(galleryTrigger.dataset.galleryKey);
+        });
+        document.addEventListener('keydown', (event) => {
+            if (photoDialog.open) {
+                if (event.key === 'ArrowRight') { event.preventDefault(); moveGalleryPhoto(1); }
+                if (event.key === 'ArrowLeft') { event.preventDefault(); moveGalleryPhoto(-1); }
+                return;
+            }
+            const galleryTrigger = event.target.closest?.('.facility-gallery-card');
+            if (galleryTrigger && (event.key === 'Enter' || event.key === ' ')) {
+                event.preventDefault();
+                openPhotoGallery(galleryTrigger.dataset.galleryKey);
+            }
+        });
+        document.getElementById('galleryPrevious').addEventListener('click', () => moveGalleryPhoto(-1));
+        document.getElementById('galleryNext').addEventListener('click', () => moveGalleryPhoto(1));
+        document.getElementById('galleryClose').addEventListener('click', () => photoDialog.close());
+        photoDialog.addEventListener('click', (event) => {
+            if (event.target === photoDialog) photoDialog.close();
+        });
+
+        const adminPortal = document.getElementById('adminPortal');
+        const adminDashboardFrame = document.getElementById('adminDashboardFrame');
+        function sendAdmissionsToAdmin() {
+            try {
+                const admissions = JSON.parse(localStorage.getItem('endeavourAdmissions') || '[]');
+                adminDashboardFrame.contentWindow.postMessage({ type: 'endeavour-admissions-sync', admissions }, '*');
+            } catch (error) {
+                console.warn('Admission records could not be shared with the admin dashboard.', error);
+            }
+        }
+        function syncAdminPortal() {
+            const isOpen = window.location.hash === '#admin';
+            adminPortal.hidden = !isOpen;
+            adminPortal.setAttribute('aria-hidden', String(!isOpen));
+            document.body.classList.toggle('admin-portal-open', isOpen);
+            if (isOpen) sendAdmissionsToAdmin();
+        }
+        adminDashboardFrame.addEventListener('load', sendAdmissionsToAdmin);
+        window.addEventListener('message', (event) => {
+            if (event.source !== adminDashboardFrame.contentWindow || event.data?.type !== 'endeavour-admissions-update' || !Array.isArray(event.data.admissions)) return;
+            try {
+                localStorage.setItem('endeavourAdmissions', JSON.stringify(event.data.admissions));
+            } catch (error) {
+                console.warn('Updated admission records could not be saved.', error);
+            }
+        });
+        document.querySelectorAll('a[href="#admin"]').forEach((link) => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                if (window.location.hash !== '#admin') window.location.hash = 'admin';
+                syncAdminPortal();
+            });
+        });
+        document.getElementById('closeAdminPortal').addEventListener('click', () => {
+            history.replaceState(null, '', `${location.pathname}${location.search}`);
+            syncAdminPortal();
+        });
+        window.addEventListener('hashchange', syncAdminPortal);
+        syncAdminPortal();
+
+        // Reveal content as it enters view, while keeping reduced-motion users unaffected.
+        const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+        if (!motionPreference.matches && 'IntersectionObserver' in window) {
+            document.documentElement.classList.add('motion-ready');
+            const revealElements = document.querySelectorAll(
+                '#home > div > span, #home h1, #home p, #home .flex > a, #home .grid > div, section:not(#home) h2, section:not(#home) blockquote, section:not(#home) .grid > div'
+            );
+            const revealObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+            revealElements.forEach((element, index) => {
+                element.dataset.reveal = '';
+                element.style.setProperty('--reveal-delay', `${(index % 4) * 90}ms`);
+                revealObserver.observe(element);
+            });
+        }
+
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Dark Mode Toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        darkModeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+
+        // Auto Grade Calculation based on DOB (Bonus feature)
+        const dobInput = document.getElementById('dob');
+        const gradeSelect = document.getElementById('grade');
+
+        dobInput.addEventListener('change', () => {
+            const dob = new Date(dobInput.value);
+            if (isNaN(dob)) return;
+            const today = new Date();
+            let age = today.getFullYear() - dob.getFullYear();
+            const m = today.getMonth() - dob.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+            // Approximate school age rule: Age 6 -> Grade 1, etc.
+            let suggestedGradeNum = age - 5;
+            if (suggestedGradeNum < 1) suggestedGradeNum = 1;
+            if (suggestedGradeNum > 12) suggestedGradeNum = 12;
+            
+            gradeSelect.value = `Grade ${suggestedGradeNum}`;
+        });
+
+        // Form Validation & Submission
+        const form = document.getElementById('enquiryForm');
+        const formContainer = document.getElementById('formContainer');
+        const thankYouMessage = document.getElementById('thankYouMessage');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            let isValid = true;
+
+            // Helper function for errors
+            function setError(inputElem, errorElem, show) {
+                if (show) {
+                    inputElem.classList.add('input-error');
+                    errorElem.style.display = 'block';
+                    isValid = false;
+                } else {
+                    inputElem.classList.remove('input-error');
+                    errorElem.style.display = 'none';
+                }
+            }
+
+            // 1. Parent Name
+            const parentName = document.getElementById('parentName');
+            const parentNameError = document.getElementById('parentNameError');
+            setError(parentName, parentNameError, !parentName.value.trim());
+
+            // 2. Child Name
+            const childName = document.getElementById('childName');
+            const childNameError = document.getElementById('childNameError');
+            setError(childName, childNameError, !childName.value.trim());
+
+            // 3. DOB
+            const dob = document.getElementById('dob');
+            const dobError = document.getElementById('dobError');
+            setError(dob, dobError, !dob.value);
+
+            // 4. Grade
+            const grade = document.getElementById('grade');
+            const gradeError = document.getElementById('gradeError');
+            setError(grade, gradeError, !grade.value);
+
+            // 5. Email (Validation check)
+            const email = document.getElementById('email');
+            const emailError = document.getElementById('emailError');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            setError(email, emailError, !emailRegex.test(email.value.trim()));
+
+            // 6. Phone (10 digits check)
+            const phone = document.getElementById('phone');
+            const phoneError = document.getElementById('phoneError');
+            const phoneRegex = /^\d{10}$/;
+            setError(phone, phoneError, !phoneRegex.test(phone.value.trim()));
+
+            // 7. Source Radio
+            const sourceRadios = document.getElementsByName('source');
+            const sourceError = document.getElementById('sourceError');
+            let sourceSelected = false;
+            for (let r of sourceRadios) {
+                if (r.checked) {
+                    sourceSelected = true;
+                    break;
+                }
+            }
+            if (!sourceSelected) {
+                sourceError.style.display = 'block';
+                isValid = false;
+            } else {
+                sourceError.style.display = 'none';
+            }
+
+            // 8. Consent Checkbox
+            const consent = document.getElementById('consent');
+            const consentError = document.getElementById('consentError');
+            setError(consent, consentError, !consent.checked);
+
+            // If all valid, replace form with success message
+            if (isValid) {
+                document.getElementById('confParentName').textContent = parentName.value.trim();
+                document.getElementById('confChildName').textContent = childName.value.trim();
+                document.getElementById('confGrade').textContent = grade.value;
+                document.getElementById('confEmail').textContent = email.value.trim();
+
+                try {
+                    const admissions = JSON.parse(localStorage.getItem('endeavourAdmissions') || '[]');
+                    admissions.unshift({
+                        id: Date.now().toString(),
+                        guardian: parentName.value.trim(),
+                        child: childName.value.trim(),
+                        dob: dob.value,
+                        grade: grade.value,
+                        email: email.value.trim(),
+                        phone: phone.value.trim(),
+                        previousSchool: document.getElementById('prevSchool').value.trim(),
+                        source: document.querySelector('input[name="source"]:checked').value,
+                        message: document.getElementById('message').value.trim(),
+                        consent: consent.checked,
+                        date: new Date().toISOString().slice(0, 10),
+                        submittedAt: new Date().toISOString(),
+                        status: 'New'
+                    });
+                    localStorage.setItem('endeavourAdmissions', JSON.stringify(admissions));
+                    adminDashboardFrame.contentWindow.postMessage({ type: 'endeavour-admissions-sync', admissions }, '*');
+                } catch (storageError) {
+                    console.warn('Admission was received but could not be saved in this browser.', storageError);
+                }
+
+                formContainer.classList.add('hidden');
+                thankYouMessage.classList.remove('hidden');
+            }
+        });
+
+        function resetForm() {
+            form.reset();
+            thankYouMessage.classList.add('hidden');
+            formContainer.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
